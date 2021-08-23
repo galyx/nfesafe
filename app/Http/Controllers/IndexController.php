@@ -23,6 +23,11 @@ class IndexController extends Controller
         return view('notas', compact('companies'));
     }
 
+    public function empresas()
+    {
+        return view('empresas');
+    }
+
     public function buscaNotas(Request $request)
     {
         if($request->company){

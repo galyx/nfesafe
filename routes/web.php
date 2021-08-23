@@ -19,6 +19,8 @@ Route::get('/downloadTOTAL', [SefazController::class, 'downloadTOTAL']);
 
 Route::get('/', [IndexController::class, 'dashboard']);
 Route::get('/notas', [IndexController::class, 'notas']);
+Route::get('/empresas', [IndexController::class, 'empresas']);
+
 Route::post('/buscaNotas', [IndexController::class, 'buscaNotas']);
 
 Route::get('/downloadNFE/{company_id}/{user_id}', [SefazController::class, 'downloadNFE']);

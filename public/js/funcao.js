@@ -19,6 +19,13 @@ $(document).ready(function(){
         }
     });
 
+    $(document).ready(function() {
+        var user_name = $('#user_name').text();
+        user_name = user_name.split(' ');
+        var intials = user_name[0].charAt(0) + user_name[user_name.length - 1].charAt(0);
+        $('#image_perfil').text(intials.toUpperCase());
+    });
+
     function buscaNotas(){
         $('.carregando').html('<div style="width: 1.5rem; height: 1.5rem;" class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>');
         $('.btnBuscaNotas').prop('disabled', true);

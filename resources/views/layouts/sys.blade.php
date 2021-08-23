@@ -75,12 +75,12 @@
                 <div class="sidebar">
                     <!-- Sidebar user panel (optional) -->
                     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                        <div class="image">
-                            <img src="{{asset('profileimg/noimg/avatar.png')}}" class="img-circle elevation-2" alt="User Image">
+                        <div class="image pl-1">
+                            <span class="img-circle elevation-2" id="image_perfil" alt="User Image"></span>
                         </div>
-                        <div class="info">
-                            <a href="#" class="d-block">Usuario Teste</a>
-                            {{-- <a href="#" class="d-block">{{auth()->user()->name}}</a> --}}
+                        <div class="info mt-auto">
+                            <span class="d-block" id="user_name">Usuario Teste</span>
+                            {{-- <span class="d-block" id="user_name">{{ auth()->user()->name }}</span> --}}
                         </div>
                     </div>
 
@@ -109,6 +109,12 @@
                                 <a href="{{asset('notas')}}" class="nav-link @if(Request::is('notas')) active @endif">
                                     <i class="nav-icon fas fa-archive"></i>
                                     <p>Notas</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{asset('empresas')}}" class="nav-link @if(Request::is('empresas')) active @endif">
+                                    <i class="nav-icon fas fa-building"></i>
+                                    <p>Empresas</p>
                                 </a>
                             </li>
                         </ul>

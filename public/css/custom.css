@@ -1,3 +1,19 @@
 .carregando {
     margin: 0 10px !important;
 }
+
+#image_perfil {
+    font-size: 2rem;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 2px 4px;
+    background: linear-gradient(180deg, rgba(9,9,121,1) 0%, rgba(0,0,0,1) 100%);
+}
+
+#user_name {
+    color: #fff;
+    font-weight: bold;
+}
+.brand-image-logo{
+    width: 100px;
+}
