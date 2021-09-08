@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\SefazController;
+use App\Http\Controllers\CompanyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,12 +15,16 @@ use App\Http\Controllers\SefazController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::any('/cep/{cep}', [IndexController::class, 'cepConsulta']);
 
 Route::get('/downloadTOTAL', [SefazController::class, 'downloadTOTAL']);
 
 Route::get('/', [IndexController::class, 'dashboard']);
 Route::get('/notas', [IndexController::class, 'notas']);
 Route::get('/empresas', [IndexController::class, 'empresas']);
+
+Route::post('/leCertificado', [CompanyController::class, 'leCertificado'])->name('leCertificado');
+Route::post('/novaEmpresa', [CompanyController::class, 'novaEmpresa'])->name('novaEmpresa');
 
 Route::post('/buscaNotas', [IndexController::class, 'buscaNotas']);
 

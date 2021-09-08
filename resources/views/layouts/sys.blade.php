@@ -135,6 +135,10 @@
 
         <!-- jQuery -->
         <script src="{{asset('plugin/jquery-3.6.0.min.js')}}"></script>
+        <!-- MaskJquery -->
+        <script src="{{asset('plugin/mask.jquery.js')}}"></script>
+        <!-- ValidaCnpjCpf -->
+        <script src="{{asset('plugin/valida_cpf_cnpj.js')}}"></script>
         <!-- bootstrap-4.6.0 -->
         <script src="{{asset('plugin/bootstrap-4.6.0/js/bootstrap.bundle.min.js')}}"></script>
         <!-- SweetALert 2 -->

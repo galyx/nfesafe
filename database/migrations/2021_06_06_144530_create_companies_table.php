@@ -25,7 +25,7 @@ class CreateCompaniesTable extends Migration
             $table->string('city');
             $table->string('state');
             $table->string('post_code');
-            $table->string('certificate');
+            $table->text('certificate');
             $table->string('password');
             $table->char('active');
             $table->timestamps();

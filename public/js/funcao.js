@@ -4,6 +4,8 @@ $(document).ready(function(){
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+
+    $('[name="post_code"]').mask('00000-000');
     
     $('.select2').select2();
 
@@ -16,6 +18,79 @@ $(document).ready(function(){
             monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','outubro','Novembro','Dezembro'],
             applyLabel: 'Aplicar',
             cancelLabel: 'Cancelar'
+        }
+    });
+
+    // Busca dos estados
+    $(function(){
+        if($('[name="state"]')){
+            $.ajax({
+                url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/',
+                type: 'GET',
+                success: (data) => {
+                    // console.log(data);
+                    for(var i=0; data.length>i; i++){
+                        $('[name="state"]').append('<option value="'+data[i].sigla+'" data-sigla_id="'+data[i].id+'">'+data[i].sigla+' - '+data[i].nome+'</option>');
+                    }
+                }
+            });
+        }
+    });
+
+    // Busca das cidades/municipios
+    $(document).on('change', '[name="state"]', function(){
+        let sigla_id = $(this).find(':selected').data('sigla_id');
+        let select = $(this).parent().parent().find('select[name="city"]');
+
+        $.ajax({
+            url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/'+sigla_id+'/municipios',
+            type: 'GET',
+            success: (data) => {
+                // console.log(data);
+                select.empty();
+                select.append('<option value="">::Selecione uma Opção::</option>');
+                if(select.is('.entrega')){
+                    select.append('<option value="Toda Região">Toda Região</option>');
+                }
+
+                for(var i=0; data.length>i; i++){
+                    select.append('<option value="'+data[i].nome+'">'+data[i].nome+'</option>');
+                }
+            }
+        });
+    });
+
+    $('[name="post_code"]').on('keyup blur', function(){
+        $(this).parent().parent().find('input, select').attr('readonly', false);
+        $(this).parent().parent().find('input, select').trigger('change');
+
+        if($(this).val().length == 9){
+            $('.loadCep').removeClass('d-none');
+            $.ajax({
+                url: '/cep/'+$(this).val(),
+                type: 'GET',
+                success: (data) => {
+                    $('[name="address"]').val(data.logradouro);
+                    if(data.logradouro) $('[name="address"]').prop('readonly', true);
+                    $('[name="address2"]').val(data.bairro);
+                    if(data.bairro) $('[name="address2"]').prop('readonly', true);
+                    $('[name="state"]').val(data.uf);
+                    if(data.uf) {
+                        $('[name="state"]').attr('readonly', true);
+                        $('[name="state"]').trigger('change');
+                    }
+                    setTimeout(() => {
+                        $('[name="city"]').val(data.localidade);
+                        if(data.localidade) {
+                            $('[name="city"]').attr('readonly', true);
+                            $('[name="city"]').trigger('change');
+                        }
+                    }, 800);
+
+                    $('[name="number"]').focus();
+                    $('.loadCep').addClass('d-none');
+                }
+            });
         }
     });
 
@@ -290,4 +365,25 @@ $(document).ready(function(){
             });
         }
     });
+
+    // Função para ler o certificado
+    // $(document).on('change', '.certificate', function(){
+    //     var certificate = $(this);
+    //     var formData = new FormData();
+    //     formData.append('certificate',certificate.prop('files')[0])
+    //     $.ajax({
+    //         url: '/leCertificado',
+    //         type: "POST",
+    //         data: formData,
+    //         cache: false,
+    //         contentType: false,
+    //         processData: false,
+    //         success: (data) => {
+    //             console.log(data);
+    //         },
+    //         error: (err) => {
+    //             console.log(err);
+    //         }
+    //     });
+    // });
 });
