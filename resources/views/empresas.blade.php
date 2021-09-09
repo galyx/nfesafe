@@ -32,6 +32,30 @@
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
+                                <tbody>
+                                    @forelse ($companies as $company)
+                                        <tr class="tr-id-{{$company->id}}">
+                                            <td>#{{$company->id}}</td>
+                                            <td>{{$company->cnpj}}</td>
+                                            <td>{{$company->corporate_name}}</td>
+                                            <td>{{$company->fantasy_name}}</td>
+                                            <td>{{$company->address}}, Nº {{$company->number}}</td>
+                                            <td>{{$company->address2}}</td>
+                                            <td>{{$company->city}}</td>
+                                            <td>{{$company->state}}</td>
+                                            <td>{{$company->post_code}}</td>
+                                            <td>{{date('d/m/Y H:i:s', strtotime(str_replace('-','/',$company->validate_certificate)))}}</td>
+                                            <td>
+                                                <div class="btn-group" role="group" aria-label="">
+                                                    <a href="#" class="btn btn-info btn-xs btn-editar" data-dados="{{json_encode($company)}}"><i class="fas fa-edit"></i> Alterar</a>
+                                                    <a href="#" class="btn btn-danger btn-xs btn-excluir" data-id="'.$company->id.'"><i class="fas fa-trash"></i> Apagar</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="11">Sem empresas Registradas. <a href="{{route('notas')}}" class="btn btn-link">Clique Aqui</a> para Registra uma Nova!</td></tr>
+                                    @endforelse
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -43,7 +67,7 @@
     <div class="modal fade" id="novaEmpresa">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="{{route('novaEmpresa')}}" method="post" id="postNovaEmpresa">
+                <form action="#" method="post" id="postNovaEmpresa">
                     @csrf
                     <div class="modal-header">
                         <h4 class="modal-title">Nova Empresa <div class="spinner-border d-none loadCep" role="status"><span class="sr-only">Loading...</span></div></h4>
@@ -53,23 +77,23 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-12 pb-3">
+                            <div class="form-group col-12">
                                 <label for="certificate">Certificado Digital</label>
                                 <input type="file" name="certificate" class="form-control-file">
                             </div>
-                            <div class="col-12">
+                            <div class="form-group col-12">
                                 <label for="certificate_pass">Senha do Certificado Digital</label>
                                 <input type="password" name="certificate_pass" class="form-control">
                             </div>
-                            <div class="col-12">
+                            <div class="form-group col-12">
                                 <label for="cnpj">CNPJ da Empresa</label>
                                 <input type="text" name="cnpj" class="form-control">
                             </div>
-                            <div class="col-12">
+                            <div class="form-group col-12">
                                 <label for="corporate_name">Razão Social</label>
                                 <input type="text" name="corporate_name" class="form-control">
                             </div>
-                            <div class="col-12">
+                            <div class="form-group col-12">
                                 <label for="fantasy_name">Nome Fantasia</label>
                                 <input type="text" name="fantasy_name" class="form-control">
                             </div>

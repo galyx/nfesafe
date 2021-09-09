@@ -5,7 +5,18 @@ $(document).ready(function(){
         }
     });
 
+    // Condifgurações
+    var Toast = Swal.mixin({
+        toast: true,
+        position: 'center',
+        showConfirmButton: false,
+        timer: 4000
+    });
+
+    $('[name="cnpj"]').mask('00.000.000/0000-00');
     $('[name="post_code"]').mask('00000-000');
+    $('[name="phone1"]').mask('(00) 0000-0000');
+    $('[name="phone2"]').mask('(00) 00000-0000');
     
     $('.select2').select2();
 
@@ -233,14 +244,12 @@ $(document).ready(function(){
     });
 
     // Função salva dados gerais
-    $(document).on('click', '.btn-save', function(){
+    $(document).on('click', '.btn-salvar', function(){
         // Pegamos os dados do data
         let save_target = $(this).data('save_target');
         let save_route = $(this).data('save_route');
         let update_table = $(this).data('update_table');
-
-        // Função extra antes de chamar o ajax para resolver antes de entrar aqui
-        // funcaoEventoExtra($(save_target).serializeArray(), save_target);
+        let table_trash = $(this).data('trash');
 
         // Por mais que tenha erro, limpamos para os outros que não tenha
         $(save_target).find('input').removeClass('is-invalid');
@@ -264,18 +273,24 @@ $(document).ready(function(){
                 $(modal).parent().parent().modal('hide');
 
                 $(save_target).find('input[type="text"]').val('');
+                $(save_target).find('input, select').attr('readonly', false);
 
-                if(update_table == 'S') if(data.table_tr) $('table tbody').append(data.table_tr);
+                if(update_table == 'S') if(data.table) $('table tbody').append(data.table); // Inserindo novos dados
+                if(update_table == 'S') if(data.tb_up) $('table tbody').find('.tr-id-'+data.tb_id).html(data.tb_up); // Editando dados
 
-                Swal.fire({
-                    toast: true,
-                    icon: 'success',
-                    title: 'Os dados foram salvos com successo!',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                if(table_trash == 'S'){ // Somente quando for apagar
+                    if(data.tb_trash) $('table tbody').find('.tr-id-'+data.tb_trash).remove();
 
-                // funcaoSuccessExtra(data, save_target);
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Os dados foram excluidos com successo!'
+                    });
+                }else{
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Os dados foram salvos com successo!'
+                    });
+                }
             },
             error: (err) => {
                 // console.log(err);
@@ -283,6 +298,7 @@ $(document).ready(function(){
 
                 // Adicionamos os erros numa variavel
                 let erro_tags = err.responseJSON.errors;
+                // console.log(erro_tags);
 
                 $.each(erro_tags, (key, value) => {
                     let tag = $(save_target).find('[name="'+key+'"]');
@@ -299,6 +315,121 @@ $(document).ready(function(){
                 }
             }
         });
+    });
+
+    // Passar os dados nos campos paranão puxar um por e sim recueprar em json em um atributo
+    $(document).on('click', '.btn-editar', function(){
+        var target = $(this).data('target'); // qual modal ta sendo acessado
+        var dados = $(this).data('dados'); // dados que serão passados aos campos
+        var images = $(this).data('images'); // dados que serão passados aos campos
+
+        // Fazemos uma leitura dosa campos
+        var data = '';
+        $.each(dados, (key, value) => {
+            $(target).find('[name="'+key+'"').val(value); // os campos name são iguais aos das colunas vidna do banco
+            $(target).find('.'+key).val(value); // quando o campo name por motivos especiais for diferente, pega por class tambem
+
+            $(target).find('._'+key).text(value); // qunado campo for texto
+
+            // Especifico para o modal editarProduto
+            if(key == 'description'){
+                $(target).find('.note-editable').html(value);
+            }
+
+            // Especifico para o modal editarProduto
+            if(key == 'value'){
+                if(target !== '#editarCupom' && target !== '#editarPromocao'){
+                    if(value){
+                        $(target).find('[name="'+key+'"').val(parseFloat(value).toFixed(2).toString().replace('.',','));
+                    }
+                }
+            }
+
+            if(key == 'price'){
+                if(target !== '#editarCupom'){
+                    if(value){
+                        $(target).find('[name="'+key+'"').val(parseFloat(value).toFixed(2).toString().replace('.',','));
+                    }
+                }
+            }
+
+            if(key == 'weight'){
+                if(target !== '#editarCupom'){
+                    if(value){
+                        $(target).find('[name="'+key+'"').val(parseFloat(value).toFixed(3).toString().replace('.',','));
+                    }
+                }
+            }
+
+            // Especifico para o modal editarProduto
+            if(key == 'has_preparation' && value == 'S'){
+                $(target).find('.has_preparation').trigger('click');
+            }
+            if(key == 'product_category'){
+                var sub_category = [];
+                for(var i=0; value.length>i; i++){
+                    if(value[i].category_pai == 'S'){
+                        $(target).find('[name="main_category"]').val(value[i].category_id);
+                        $(target).find('.main_category').trigger('change');
+                    }
+
+                    if(value[i].category_pai == 'N'){
+                        sub_category.push(value[i].category_id);
+                    }
+                }
+
+                setTimeout(()=>{
+                    $(target).find('.sub_category').val(sub_category).trigger('change');
+                },1000, sub_category);
+            }
+            if(key == 'product_attribute'){
+                for(var i=0; value.length>i; i++){
+                    if(value[i].attribute_id == null) {
+                        $(target).find('#edit_icheck_'+value[i].parent_id).trigger('click');
+                    }
+                    $(target).find('#edit_icheck_'+value[i].attribute_id).trigger('click');
+                    $(target).find('[name="attribute['+value[i].attribute_id+'][attribute_value]"]').val(typeof value[i].attribute_value == 'number' ? value[i].attribute_value.toFixed(2).toString().replace('.',',') : '');
+                }
+            }
+
+            if(target == '#editarCupom'){
+                if(key == 'discount_accepted') $(target).find('.discount_accepted').val(JSON.parse(value));
+                if(key == 'user_id') $(target).find('.user_id').val(JSON.parse(value));
+            }
+
+            // Especifico para promoções
+            if(key == 'start_date'){
+                var date = value.split('-');
+                $(target).find('[name="start_end_date"]').data('daterangepicker').setStartDate(date[2]+'/'+date[1]+'/'+date[0]);
+            }
+            if(key == 'final_date'){
+                var date = value.split('-');
+                $(target).find('[name="start_end_date"]').data('daterangepicker').setEndDate(date[2]+'/'+date[1]+'/'+date[0]);
+            }
+
+            // especifico atributo
+            if(key == 'hexadecimal') {
+                if(value) $(target).find('[value="color"]').trigger('click');
+                if(value) $(target).find('[name="color"]').trigger('change');
+            }
+            if(key == 'image') if(value) $(target).find('[value="image"]').trigger('click');
+        });
+
+        // Caso teha as imagens ele le e adiconsa
+        if(images){
+            for(var i=0; images.length>i; i++){
+                if(i == 0){
+                    $(target).find('.img-principal').append('<img class="rounded" style="height: 180px" src="'+images[i].image+'">');
+                }else{
+                    $(target).find('.img-multipla').append('<img class="rounded mx-1" style="height: 80px" src="'+images[i].image+'">');
+                }
+            }
+        }
+
+        // Especifico para o modal editarProduto
+        $(target).find('.sales_unit').trigger('change');
+        $(target).find('[name="post_code"]').trigger('keyup');
+        $(target).find('select').trigger('change');
     });
 
     $(document).on('click', '.btn-disable', function(){

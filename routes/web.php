@@ -20,8 +20,8 @@ Route::any('/cep/{cep}', [IndexController::class, 'cepConsulta']);
 Route::get('/downloadTOTAL', [SefazController::class, 'downloadTOTAL']);
 
 Route::get('/', [IndexController::class, 'dashboard']);
-Route::get('/notas', [IndexController::class, 'notas']);
-Route::get('/empresas', [IndexController::class, 'empresas']);
+Route::get('/notas', [IndexController::class, 'notas'])->name('notas');
+Route::get('/empresas', [IndexController::class, 'empresas'])->name('empresas');
 
 Route::post('/leCertificado', [CompanyController::class, 'leCertificado'])->name('leCertificado');
 Route::post('/novaEmpresa', [CompanyController::class, 'novaEmpresa'])->name('novaEmpresa');

@@ -21,11 +21,15 @@ class CreateCompaniesTable extends Migration
             $table->string('fantasy_name');
             $table->string('address');
             $table->string('number');
-            $table->string('adrres2');
+            $table->string('address2');
             $table->string('city');
+            $table->string('complement')->nullable();
             $table->string('state');
             $table->string('post_code');
+            $table->string('phone1')->nullable();
+            $table->string('phone2')->nullable();
             $table->text('certificate');
+            $table->dateTime('validate_certificate');
             $table->string('password');
             $table->char('active');
             $table->timestamps();

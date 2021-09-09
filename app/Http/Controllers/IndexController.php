@@ -42,7 +42,8 @@ class IndexController extends Controller
 
     public function empresas()
     {
-        return view('empresas');
+        $companies = Company::where('user_id', '1')->get();
+        return view('empresas', compact('companies'));
     }
 
     public function buscaNotas(Request $request)
