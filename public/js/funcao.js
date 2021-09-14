@@ -134,7 +134,7 @@ $(document).ready(function(){
             type: 'POST',
             data: datas,
             success: (data) => {
-                // console.log(data);
+                console.log(data);
                 $('#div_table_notas').removeClass('d-none');
                 $("#table_notas").dataTable().fnClearTable();
                 $("#table_notas").dataTable().fnDestroy();
@@ -321,115 +321,19 @@ $(document).ready(function(){
     $(document).on('click', '.btn-editar', function(){
         var target = $(this).data('target'); // qual modal ta sendo acessado
         var dados = $(this).data('dados'); // dados que serão passados aos campos
-        var images = $(this).data('images'); // dados que serão passados aos campos
 
         // Fazemos uma leitura dosa campos
         var data = '';
         $.each(dados, (key, value) => {
-            $(target).find('[name="'+key+'"').val(value); // os campos name são iguais aos das colunas vidna do banco
-            $(target).find('.'+key).val(value); // quando o campo name por motivos especiais for diferente, pega por class tambem
+            if($(target).find('[name="'+key+'"').attr('type') !== 'file' && $(target).find('[name="'+key+'"').attr('type') !== 'password'){
+                $(target).find('[name="'+key+'"').val(value); // os campos name são iguais aos das colunas vidna do banco
+                $(target).find('.'+key).val(value); // quando o campo name por motivos especiais for diferente, pega por class tambem
 
-            $(target).find('._'+key).text(value); // qunado campo for texto
-
-            // Especifico para o modal editarProduto
-            if(key == 'description'){
-                $(target).find('.note-editable').html(value);
+                $(target).find('._'+key).text(value); // qunado campo for texto
             }
-
-            // Especifico para o modal editarProduto
-            if(key == 'value'){
-                if(target !== '#editarCupom' && target !== '#editarPromocao'){
-                    if(value){
-                        $(target).find('[name="'+key+'"').val(parseFloat(value).toFixed(2).toString().replace('.',','));
-                    }
-                }
-            }
-
-            if(key == 'price'){
-                if(target !== '#editarCupom'){
-                    if(value){
-                        $(target).find('[name="'+key+'"').val(parseFloat(value).toFixed(2).toString().replace('.',','));
-                    }
-                }
-            }
-
-            if(key == 'weight'){
-                if(target !== '#editarCupom'){
-                    if(value){
-                        $(target).find('[name="'+key+'"').val(parseFloat(value).toFixed(3).toString().replace('.',','));
-                    }
-                }
-            }
-
-            // Especifico para o modal editarProduto
-            if(key == 'has_preparation' && value == 'S'){
-                $(target).find('.has_preparation').trigger('click');
-            }
-            if(key == 'product_category'){
-                var sub_category = [];
-                for(var i=0; value.length>i; i++){
-                    if(value[i].category_pai == 'S'){
-                        $(target).find('[name="main_category"]').val(value[i].category_id);
-                        $(target).find('.main_category').trigger('change');
-                    }
-
-                    if(value[i].category_pai == 'N'){
-                        sub_category.push(value[i].category_id);
-                    }
-                }
-
-                setTimeout(()=>{
-                    $(target).find('.sub_category').val(sub_category).trigger('change');
-                },1000, sub_category);
-            }
-            if(key == 'product_attribute'){
-                for(var i=0; value.length>i; i++){
-                    if(value[i].attribute_id == null) {
-                        $(target).find('#edit_icheck_'+value[i].parent_id).trigger('click');
-                    }
-                    $(target).find('#edit_icheck_'+value[i].attribute_id).trigger('click');
-                    $(target).find('[name="attribute['+value[i].attribute_id+'][attribute_value]"]').val(typeof value[i].attribute_value == 'number' ? value[i].attribute_value.toFixed(2).toString().replace('.',',') : '');
-                }
-            }
-
-            if(target == '#editarCupom'){
-                if(key == 'discount_accepted') $(target).find('.discount_accepted').val(JSON.parse(value));
-                if(key == 'user_id') $(target).find('.user_id').val(JSON.parse(value));
-            }
-
-            // Especifico para promoções
-            if(key == 'start_date'){
-                var date = value.split('-');
-                $(target).find('[name="start_end_date"]').data('daterangepicker').setStartDate(date[2]+'/'+date[1]+'/'+date[0]);
-            }
-            if(key == 'final_date'){
-                var date = value.split('-');
-                $(target).find('[name="start_end_date"]').data('daterangepicker').setEndDate(date[2]+'/'+date[1]+'/'+date[0]);
-            }
-
-            // especifico atributo
-            if(key == 'hexadecimal') {
-                if(value) $(target).find('[value="color"]').trigger('click');
-                if(value) $(target).find('[name="color"]').trigger('change');
-            }
-            if(key == 'image') if(value) $(target).find('[value="image"]').trigger('click');
         });
 
-        // Caso teha as imagens ele le e adiconsa
-        if(images){
-            for(var i=0; images.length>i; i++){
-                if(i == 0){
-                    $(target).find('.img-principal').append('<img class="rounded" style="height: 180px" src="'+images[i].image+'">');
-                }else{
-                    $(target).find('.img-multipla').append('<img class="rounded mx-1" style="height: 80px" src="'+images[i].image+'">');
-                }
-            }
-        }
-
-        // Especifico para o modal editarProduto
-        $(target).find('.sales_unit').trigger('change');
         $(target).find('[name="post_code"]').trigger('keyup');
-        $(target).find('select').trigger('change');
     });
 
     $(document).on('click', '.btn-disable', function(){

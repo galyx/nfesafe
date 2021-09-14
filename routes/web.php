@@ -25,6 +25,8 @@ Route::get('/empresas', [IndexController::class, 'empresas'])->name('empresas');
 
 Route::post('/leCertificado', [CompanyController::class, 'leCertificado'])->name('leCertificado');
 Route::post('/novaEmpresa', [CompanyController::class, 'novaEmpresa'])->name('novaEmpresa');
+Route::post('/alterarEmpresa', [CompanyController::class, 'alterarEmpresa'])->name('alterarEmpresa');
+Route::post('/apagarEmpresa', [CompanyController::class, 'apagarEmpresa'])->name('apagarEmpresa');
 
 Route::post('/buscaNotas', [IndexController::class, 'buscaNotas']);
 

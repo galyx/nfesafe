@@ -42,7 +42,8 @@ class SefazController extends Controller
             "versao" => '4.00',
         ];
         $configJson = json_encode($arr); // Transformando em JSON os dados que precisa mandar
-        $pfxcontent = file_get_contents('./certificados/certificado.pfx'); // Dados do certificado
+        // $pfxcontent = file_get_contents('./certificados/certificado.pfx'); // Dados do certificado
+        $pfxcontent = $company; // Dados do certificado
 
         $tools = new nfe($configJson, Certificate::readPfx($pfxcontent, '1234')); // Mandando os dado para o sefaz
         $tools->model('55'); //Informando que é o Modelo 55
