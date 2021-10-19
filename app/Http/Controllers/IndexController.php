@@ -55,9 +55,11 @@ class IndexController extends Controller
 
             $company = Company::where('id', $request->company)->first();
 
-            $dockeys = DocKey::where('user_id', '1')->where('company_id', $request->company)->where('issue_date', '>=', $start_date)->where('issue_date', '<=', $final_date);
+            $dockeys = DocKey::with(['DocXmls' => function ($query) {
+                return $query->orderBy('nsu', 'DESC');
+            }])->where('user_id', '1')->where('company_id', $request->company)->where('issue_date', '>=', $start_date)->where('issue_date', '<=', $final_date);
             if($request->document_template) $dockeys->where('document_template', $request->document_template);
-            if($request->issuer) $dockeys->where('issuer_cnpj', ($request->issuer == 'third' ? '!=' : '='), $company->cnpj);
+            if($request->issuer) $dockeys->where('issuer_cnpj', ($request->issuer == 'third' ? '!=' : '='), str_replace(['.','/','-'],'',$company->cnpj));
             if($request->doc_key) $dockeys->where('doc_key', $request->doc_key);
             if($request->issuer_cnpj) $dockeys->where('issuer_cnpj', $request->issuer_cnpj);
             $dockeys = $dockeys->get();
@@ -65,8 +67,8 @@ class IndexController extends Controller
             $docKeysNews = [];
             foreach($dockeys as $value){
                 $docKeysNews[] = [
-                    'doc_key' => $value->doc_key,
-                    'button' => '<button type="button" class="btn btn-primary btn-sm" data-id="'.$value->id.'" title="Informações"><i class="fas fa-info"></i></button>',
+                    'doc_key' => $value->doc_key.' '.($value->DocXmls ? ($value->DocXmls[0]->event_type == '210210' && $value->DocXmls[0]->issuer_cnpj !== str_replace(['.','/','-'],'',$company->cnpj) ? '<i class="fas fa-file-code"></i>' : '') : ''),
+                    'button' => '<button type="button" class="btn btn-primary btn-sm btn-modal-info" data-id="'.$value->id.'" title="Informações"><i class="fas fa-info"></i></button>',
                     'document_template' => $value->document_template,
                     'grade_series' => $value->grade_series,
                     'note_number' => $value->note_number,
@@ -82,5 +84,10 @@ class IndexController extends Controller
             }
             return response()->json($docKeysNews);
         }
+    }
+
+    public function buscaDadosNotas(Request $request)
+    {
+        # code...
     }
 }

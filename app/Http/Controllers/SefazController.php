@@ -36,16 +36,15 @@ class SefazController extends Controller
             "atualizacao" => "2021-01-01 00:00:00",
             "tpAmb" => 1,
             "razaosocial" => $company->corporate_name,
-            "cnpj" => $company->cnpj,
+            "cnpj" => str_replace(['.','/','-'], '', $company->cnpj),
             "siglaUF" => $company->state,
             "schemes" => "PL_009_V4",
             "versao" => '4.00',
         ];
         $configJson = json_encode($arr); // Transformando em JSON os dados que precisa mandar
         // $pfxcontent = file_get_contents('./certificados/certificado.pfx'); // Dados do certificado
-        $pfxcontent = $company; // Dados do certificado
 
-        $tools = new nfe($configJson, Certificate::readPfx($pfxcontent, '1234')); // Mandando os dado para o sefaz
+        $tools = new nfe($configJson, Certificate::readPfx(base64_decode($company->certificate), $company->password)); // Mandando os dado para o sefaz
         $tools->model('55'); //Informando que é o Modelo 55
 
         $lastNSU = $lastNSU; // Ultimo NSU para fazer o while funcionar
@@ -62,11 +61,15 @@ class SefazController extends Controller
 
             $lastNSU = str_pad($lastNSU, 15, '0', STR_PAD_LEFT); // O sistema precisa ter no total 15 digitos
 
+            $sefaz_excedido = false;
             try {
                 $response = $tools->sefazDistDFe($lastNSU); // Mandamos o ultimo NSU para o sefaz e liberar baixar os dados
             } catch (\Exception $e) {
-                echo $e->getMessage();
+                \Log::info($e->getMessage());
+                $sefaz_excedido = true;
             }
+
+            if($sefaz_excedido) break;
 
             //extrair e salvar os retornos
             $dom = new \DOMDocument();
@@ -311,15 +314,15 @@ class SefazController extends Controller
             "atualizacao" => "2021-01-01 00:00:00",
             "tpAmb" => 1,
             "razaosocial" => $company->corporate_name,
-            "cnpj" => $company->cnpj,
+            "cnpj" => str_replace(['.','/','-'], '', $company->cnpj),
             "siglaUF" => $company->state,
             "schemes" => "PL_CTe_300",
             "versao" => '3.00',
         ];
         $configJson = json_encode($arr); // Transformando em JSON os dados que precisa mandar
-        $pfxcontent = file_get_contents('./certificados/certificado.pfx'); // Dados do certificado
+        // $pfxcontent = file_get_contents('./certificados/certificado.pfx'); // Dados do certificado
 
-        $tools = new cte($configJson, Certificate::readPfx($pfxcontent, '1234')); // Mandando os dado para o sefaz
+        $tools = new cte($configJson, Certificate::readPfx(base64_decode($company->certificate), $company->password)); // Mandando os dado para o sefaz
 
         $lastNSU = $lastNSU; // Ultimo NSU para fazer o while funcionar
         $maxNSU = intval($lastNSU+1); // Pego o Ultimo e adiciono +1 para funcionar o while
@@ -335,11 +338,15 @@ class SefazController extends Controller
 
             $lastNSU = str_pad($lastNSU, 15, '0', STR_PAD_LEFT); // O sistema precisa ter no total 15 digitos
 
+            $sefaz_excedido = false;
             try {
                 $response = $tools->sefazDistDFe($lastNSU); // Mandamos o ultimo NSU para o sefaz e liberar baixar os dados
             } catch (\Exception $e) {
-                echo $e->getMessage();
+                \Log::info($e->getMessage());
+                $sefaz_excedido = true;
             }
+
+            if($sefaz_excedido) break;
 
             //extrair e salvar os retornos
             $dom = new \DOMDocument();
@@ -591,6 +598,11 @@ class SefazController extends Controller
             echo "<pre>";
             $this->downloadCTE($company->id, $company->user_id);
         }
+    }
+
+    public function validaNFE(Request $request)
+    {
+        # code...
     }
 
     public function consultaCNPJ($cnpj){

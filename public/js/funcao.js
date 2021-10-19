@@ -229,6 +229,8 @@ $(document).ready(function(){
                                     title: 'CTES Baixados',
                                     timer: 3000
                                 });
+
+                                $('.buscaNotas').trigger('change');
                             },
                             error: (err) => {
                                 // console.log(err);
@@ -399,6 +401,10 @@ $(document).ready(function(){
                 }
             });
         }
+    });
+
+    $(document).on('click', '.btn-modal-info', function(){
+        $('#dadosNotas').modal('show');
     });
 
     // Função para ler o certificado

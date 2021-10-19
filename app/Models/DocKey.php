@@ -25,4 +25,9 @@ class DocKey extends Model
         'issue_date',
         'amount',
     ];
+
+    public function DocXmls()
+    {
+        return $this->hasMany(DocXml::class, 'doc_key', 'doc_key');
+    }
 }
