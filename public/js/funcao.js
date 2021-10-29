@@ -338,73 +338,34 @@ $(document).ready(function(){
         $(target).find('[name="post_code"]').trigger('keyup');
     });
 
-    $(document).on('click', '.btn-disable', function(){
-        let disable_name    = $(this).data('disable_name');
-        let disable_id      = $(this).data('disable_id');
-        let type_disabled   = $(this).data('type_disabled');
-        let save_route      = $(this).data('save_route');
-
-        var isValid = true;
-        if(!type_disabled){
-            isValid = false;
-            Swal.fire({
-                icon: 'error',
-                title: '"type_disabled" vazio!'
-            });
-        }else if(!disable_id){
-            isValid = false;
-            Swal.fire({
-                icon: 'error',
-                title: '"disable_id" vazio!'
-            });
-        }
-
-        let title = '';
-
-        switch(type_disabled){
-            case 'S':
-                title = 'Ativar "'+disable_name+'"?';
-            break;
-            case 'N':
-                title = 'Desativar "'+disable_name+'"?';
-            break;
-            case 'X':
-                title = 'Excluir Permanentemente "'+disable_name+'"?';
-            break;
-        }
-
-        if(isValid){
-            Swal.fire({
-                icon: 'info',
-                title: title,
-                showCancelButton: true,
-                confirmButtonText: 'SIM',
-                cancelButtonText: 'NÃO',
-                showLoaderOnConfirm: true,
-                preConfirm: (disabled) => {
-                    return $.ajax({
-                                url: save_route,
-                                type: 'POST',
-                                data: {id: disable_id, type: type_disabled}
-                            }).then((response) => {
-                                // console.log(response);
-                                $('table tbody').find('.tr-id-'+response).remove();
-                                return response;
-                            }).catch((error) => {
-                                // console.log(error);
-                                Swal.showValidationMessage(error.responseJSON);
-                            });
-                }
-            }).then((result) => {
-                if(result.isConfirmed){
-    
-                }
-            });
-        }
-    });
-
     $(document).on('click', '.btn-modal-info', function(){
         $('#dadosNotas').modal('show');
+        var id = $(this).data('id');
+        var route = $(this).data('route');
+        $('.ver-notas').html('<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>');
+
+        $.ajax({
+            url: route,
+            type: 'POST',
+            data: {id},
+            success: (data) => {
+                console.log(data);
+                $('.ver-notas').empty();
+
+                $.each(data.doc_xmls, (key, value) => {
+                    $('.ver-notas').append(
+                        '<div class="row border rounded py-3 px-2">'+
+                            '<div class="col-6 col-md-4 py-2 px-1">Chave Documento: '+value.doc_key+'</div>'+
+                            '<div class="col-6 col-md-4 py-2 px-1">NSU: '+value.nsu+'</div>'+
+                            '<div class="col-6 col-md-4 py-2 px-1">Tipo de Evento: '+value.event_type+'</div>'+
+                            '<div class="col-6 col-md-4 py-2 px-1">Descrição do Evento: '+value.event_description+'</div>'+
+                            '<div class="col-6 col-md-4 py-2 px-1">Tipo de Documento: '+value.document_template+'</div>'+
+                            '<div class="col-6 col-md-4 py-2 px-1"><a target="_blank" href="/baixar-xml/'+value.id+'" class="btn btn-primary">Baixar XML</a></div>'+
+                        '</div>'
+                    );
+                });
+            }
+        });
     });
 
     // Função para ler o certificado

@@ -95,16 +95,30 @@
     </div>
 
     <div class="modal fade" id="dadosNotas" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="dadosNotasLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="dadosNotasLabel">Modal title</h5>
+                    <h5 class="modal-title" id="dadosNotasLabel">Dados da Nota <span class="_dockey"></span></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                ...
+                    <div class="container mb-3">
+                        <div class="row">
+                            <div class="col-4">
+                                <button type="button" class="btn btn-success btn-block">Confirmar Operação</button>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="btn btn-success btn-block">Desconhecimento da Operação</button>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="btn btn-success btn-block">Operação não Realizada</button>
+                            </div>
+                        </div>
+                    </div>
+                    <h1>Eventos Gerados</h1>
+                    <div class="container ver-notas"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

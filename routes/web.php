@@ -29,6 +29,8 @@ Route::post('/alterarEmpresa', [CompanyController::class, 'alterarEmpresa'])->na
 Route::post('/apagarEmpresa', [CompanyController::class, 'apagarEmpresa'])->name('apagarEmpresa');
 
 Route::post('/buscaNotas', [IndexController::class, 'buscaNotas']);
+Route::post('/buscaDadosNotas', [IndexController::class, 'buscaDadosNotas'])->name('buscaDadosNotas');
+Route::get('/baixar-xml/{id}', [IndexController::class, 'baixarXml'])->name('baixarXml');
 
 Route::get('/downloadNFE/{company_id}/{user_id}', [SefazController::class, 'downloadNFE']);
 Route::get('/downloadCTE/{company_id}/{user_id}', [SefazController::class, 'downloadCTE']);

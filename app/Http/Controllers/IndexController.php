@@ -68,7 +68,7 @@ class IndexController extends Controller
             foreach($dockeys as $value){
                 $docKeysNews[] = [
                     'doc_key' => $value->doc_key.' '.($value->DocXmls ? ($value->DocXmls[0]->event_type == '210210' && $value->DocXmls[0]->issuer_cnpj !== str_replace(['.','/','-'],'',$company->cnpj) ? '<i class="fas fa-file-code"></i>' : '') : ''),
-                    'button' => '<button type="button" class="btn btn-primary btn-sm btn-modal-info" data-id="'.$value->id.'" title="Informações"><i class="fas fa-info"></i></button>',
+                    'button' => '<button type="button" class="btn btn-primary btn-sm btn-modal-info" data-id="'.$value->id.'" data-route="'.route('buscaDadosNotas').'" title="Informações"><i class="fas fa-info"></i></button>',
                     'document_template' => $value->document_template,
                     'grade_series' => $value->grade_series,
                     'note_number' => $value->note_number,
@@ -88,6 +88,43 @@ class IndexController extends Controller
 
     public function buscaDadosNotas(Request $request)
     {
-        # code...
+        $dockeys = DocKey::with('DocXmls')->find($request->id);
+
+        return response()->json($dockeys);
+    }
+
+    public function baixarXml($id)
+    {
+        $docxml = DocXml::find($id);
+
+        $temp = fopen(public_path($docxml->doc_key.'.xml'), 'a');
+        fwrite($temp, '<?xml version="1.0" encoding="UTF-8"?>'.(str_replace('<?xml version="1.0" encoding="UTF-8"?>','', $docxml->xml_received)));
+        fclose($temp);
+
+        $zip = new \ZipArchive;
+        $fileName = $docxml->doc_key.'.zip'; // nome do zip
+        $zipPath = $fileName; // path do zip
+        if ($zip->open($zipPath, \ZipArchive::CREATE) === TRUE)
+        {
+            // adicionar arquivo ao zip
+            $zip->addFile($docxml->doc_key.'.xml', basename($docxml->doc_key.'.xml'));
+
+            // concluir a operacao
+            $zip->close();
+        }
+
+        unlink($docxml->doc_key.'.xml');
+
+        if(file_exists($zipPath)){
+            // Forçamos o donwload do arquivo.
+            header('Content-Type: application/zip');
+            header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
+            header('Content-Disposition: attachment; filename="'.$zipPath.'"');
+            readfile($zipPath);
+            //removemos o arquivo zip após download
+            unlink($zipPath);
+        }
+
+        // return response()->download($zipPath);
     }
 }
