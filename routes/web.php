@@ -35,6 +35,11 @@ Route::get('/baixar-xml/{id}', [IndexController::class, 'baixarXml'])->name('bai
 Route::get('/downloadNFE/{company_id}/{user_id}', [SefazController::class, 'downloadNFE']);
 Route::get('/downloadCTE/{company_id}/{user_id}', [SefazController::class, 'downloadCTE']);
 
+Route::get('/ciencia-op/{id}', [SefazController::class, 'cienciaOP']);
+Route::get('/confirma-op/{id}', [SefazController::class, 'confirmaOP']);
+Route::get('/desconhecimento-op/{id}', [SefazController::class, 'desconhecimentoOP']);
+Route::get('/op-n-realizada/{id}', [SefazController::class, 'OPnRealizada']);
+
 // Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 //     return view('dashboard');
 // })->name('dashboard');

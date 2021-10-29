@@ -89,8 +89,9 @@ class IndexController extends Controller
     public function buscaDadosNotas(Request $request)
     {
         $dockeys = DocKey::with('DocXmls')->find($request->id);
+        $company = Company::where('id', $request->company_id)->first();
 
-        return response()->json($dockeys);
+        return response()->json(['cnpj' => str_replace(['.','-','/'], '', $company->cnpj), 'dados' => $dockeys]);
     }
 
     public function baixarXml($id)

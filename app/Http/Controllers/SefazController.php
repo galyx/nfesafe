@@ -600,7 +600,7 @@ class SefazController extends Controller
         }
     }
 
-    public function validaNFE(Request $request)
+    public function cienciaOP($id)
     {
         # code...
     }

@@ -341,18 +341,31 @@ $(document).ready(function(){
     $(document).on('click', '.btn-modal-info', function(){
         $('#dadosNotas').modal('show');
         var id = $(this).data('id');
+        var company_id = $('[name="company"]').val();
         var route = $(this).data('route');
         $('.ver-notas').html('<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>');
 
         $.ajax({
             url: route,
             type: 'POST',
-            data: {id},
+            data: {id, company_id},
             success: (data) => {
                 console.log(data);
                 $('.ver-notas').empty();
 
-                $.each(data.doc_xmls, (key, value) => {
+                if(data.cnpj == data.dados.issuer_cnpj){
+                    $('.btn-valida-nfe').addClass('d-none');
+                }else{
+                    $('.btn-valida-nfe').removeClass('d-none');
+                }
+
+                $.each(data.dados.doc_xmls, (key, value) => {
+                    if(value.document_template == '57'){
+                        $('.btn-valida-nfe').addClass('d-none');
+                    }else{
+                        $('.btn-valida-nfe').removeClass('d-none');
+                    }
+
                     $('.ver-notas').append(
                         '<div class="row border rounded py-3 px-2">'+
                             '<div class="col-6 col-md-4 py-2 px-1">Chave Documento: '+value.doc_key+'</div>'+

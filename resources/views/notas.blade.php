@@ -104,16 +104,19 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="container mb-3">
+                    <div class="container btn-valida-nfe d-none mb-3">
                         <div class="row">
-                            <div class="col-4">
-                                <button type="button" class="btn btn-success btn-block">Confirmar Operação</button>
+                            <div class="col-3">
+                                <a target="_blank" href="{{asset('ciencia-op/')}}" class="btn btn-success btn-block a-ciencia">Ciencia da Operação</a>
                             </div>
-                            <div class="col-4">
-                                <button type="button" class="btn btn-success btn-block">Desconhecimento da Operação</button>
+                            <div class="col-3">
+                                <a target="_blank" href="{{asset('confirma-op/')}}" class="btn btn-success btn-block a-confirma">Confirmar Operação</a>
                             </div>
-                            <div class="col-4">
-                                <button type="button" class="btn btn-success btn-block">Operação não Realizada</button>
+                            <div class="col-3">
+                                <a href="{{asset('desconhecimento-op/')}}" class="btn btn-success btn-block a-desconhecimento">Desconhecimento da Operação</a>
+                            </div>
+                            <div class="col-3">
+                                <a href="{{asset('op-n-realizada/')}}" class="btn btn-success btn-block a-Nrealizada">Operação não Realizada</a>
                             </div>
                         </div>
                     </div>
@@ -121,8 +124,7 @@
                     <div class="container ver-notas"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Understood</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                 </div>
             </div>
         </div>
