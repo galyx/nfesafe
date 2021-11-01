@@ -243,7 +243,7 @@ class SefazController extends Controller
                 $note_number                    = intval($doc_key[25].$doc_key[26].$doc_key[27].$doc_key[28].$doc_key[29].$doc_key[30].$doc_key[31].$doc_key[32].$doc_key[33]);
 
                 $docXml['user_id']              = '1';
-                $docXml['company_id']           = '1';
+                $docXml['company_id']           = $company_id;
                 $docXml['doc_key']              = $doc_key;
                 $docXml['issuer_cnpj']          = $issuer_cnpj;
                 $docXml['issuer_name']          = isset($issuer_name)       ? $issuer_name      : '';
@@ -520,7 +520,7 @@ class SefazController extends Controller
                 $note_number                    = intval($doc_key[25].$doc_key[26].$doc_key[27].$doc_key[28].$doc_key[29].$doc_key[30].$doc_key[31].$doc_key[32].$doc_key[33]);
 
                 $docXml['user_id']              = '1';
-                $docXml['company_id']           = '1';
+                $docXml['company_id']           = $company_id;
                 $docXml['doc_key']              = $doc_key;
                 $docXml['issuer_cnpj']          = $issuer_cnpj;
                 $docXml['issuer_name']          = isset($issuer_name)       ? $issuer_name      : '';
@@ -602,7 +602,124 @@ class SefazController extends Controller
 
     public function cienciaOP($id)
     {
-        # code...
+        ini_set('max_execution_time', 10000);
+        ini_set('memory_limit','32192M');
+
+        $dockey = DocKey::find($id);
+        $company = Company::find($dockey->company_id);
+
+        $arr = [
+            "atualizacao" => "2021-01-01 00:00:00",
+            "tpAmb" => 1,
+            "razaosocial" => $company->corporate_name,
+            "cnpj" => str_replace(['.','/','-'], '', $company->cnpj),
+            "siglaUF" => $company->state,
+            "schemes" => "PL_009_V4",
+            "versao" => '4.00',
+        ];
+        $configJson = json_encode($arr); // Transformando em JSON os dados que precisa mandar
+
+        try {
+            $certificate = Certificate::readPfx(base64_decode($company->certificate), $company->password);
+            $tools = new nfe($configJson, $certificate);
+            $tools->model('55');
+        
+            $chNFe = $dockey->doc_key; //chave de 44 digitos da nota do fornecedor
+            $tpEvento = '210210'; //ciencia da operação
+            $xJust = ''; //a ciencia não requer justificativa
+            $nSeqEvento = 1; //a ciencia em geral será numero inicial de uma sequencia para essa nota e evento
+        
+            $response = $tools->sefazManifesta($chNFe,$tpEvento,$xJust = '',$nSeqEvento = 1);
+            //você pode padronizar os dados de retorno atraves da classe abaixo
+            //de forma a facilitar a extração dos dados do XML
+            //NOTA: mas lembre-se que esse XML muitas vezes será necessário, 
+            //      quando houver a necessidade de protocolos
+            $st = new standNfe($response);
+            //nesse caso $std irá conter uma representação em stdClass do XML
+            $stdRes = $st->toStd();
+
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+
+        return "<script>window.close();</script>";
+    }
+
+    public function confirmaOP($id)
+    {
+        ini_set('max_execution_time', 10000);
+        ini_set('memory_limit','32192M');
+
+        $dockey = DocKey::find($id);
+        $company = Company::find($dockey->company_id);
+
+        $arr = [
+            "atualizacao" => "2021-01-01 00:00:00",
+            "tpAmb" => 1,
+            "razaosocial" => $company->corporate_name,
+            "cnpj" => str_replace(['.','/','-'], '', $company->cnpj),
+            "siglaUF" => $company->state,
+            "schemes" => "PL_009_V4",
+            "versao" => '4.00',
+        ];
+        $configJson = json_encode($arr); // Transformando em JSON os dados que precisa mandar
+
+        try {
+            $certificate = Certificate::readPfx(base64_decode($company->certificate), $company->password);
+            $tools = new nfe($configJson, $certificate);
+            $tools->model('55');
+        
+            $chNFe = $dockey->doc_key; //chave de 44 digitos da nota do fornecedor
+            $tpEvento = '210200'; //Confirmacao da Operacao
+            $xJust = ''; //a ciencia não requer justificativa
+            $nSeqEvento = 1; //a ciencia em geral será numero inicial de uma sequencia para essa nota e evento
+        
+            $response = $tools->sefazManifesta($chNFe,$tpEvento,$xJust = '',$nSeqEvento = 1);
+            //você pode padronizar os dados de retorno atraves da classe abaixo
+            //de forma a facilitar a extração dos dados do XML
+            //NOTA: mas lembre-se que esse XML muitas vezes será necessário, 
+            //      quando houver a necessidade de protocolos
+            $st = new standNfe($response);
+            //nesse caso $std irá conter uma representação em stdClass do XML
+            $stdRes = $st->toStd();
+
+            // dd($stdRes);
+
+            if($stdRes->retEvento->infEvento->cStat == '135'){
+                $docXml['user_id']              = '1';
+                $docXml['company_id']           = $company->id;
+                $docXml['doc_key']              = $dockey->doc_key;
+                $docXml['issuer_cnpj']          = $dockey->issuer_cnpj;
+                $docXml['issuer_name']          = $dockey->issuer_name;
+                $docXml['issuer_state']         = $dockey->issuer_state;
+                $docXml['recipient_cnpj']       = $dockey->recipient_cnpj;
+                $docXml['recipient_name']       = $dockey->recipient_name;
+                $docXml['recipient_state']      = $dockey->recipient_state;
+                $docXml['document_template']    = '55';
+                $docXml['grade_series']         = '';
+                $docXml['note_number']          = '';
+                $docXml['issue_date']           = date('Y-m-d', strtotime($stdRes->retEvento->infEvento->dhRegEvento));
+                $docXml['amount']               = 0.00;
+                $docXml['nsu']                  = '';
+                $docXml['event_type']           = $stdRes->retEvento->infEvento->tpEvento;
+                $docXml['event_sequence']       = '1';
+                $docXml['note_status']          = $stdRes->retEvento->infEvento->cStat;
+                $docXml['reason']               = $stdRes->retEvento->infEvento->xMotivo;
+                $docXml['protocol_number']      = $stdRes->retEvento->infEvento->nProt;
+                $docXml['receipt_date']         = date('Y-m-d', strtotime($stdRes->retEvento->infEvento->dhRegEvento));
+                $docXml['organ_code']           = $stdRes->retEvento->infEvento->cOrgao;
+                $docXml['app_version']          = $stdRes->retEvento->infEvento->verAplic;
+                $docXml['event_description']    = $stdRes->retEvento->infEvento->xEvento;
+                $docXml['event_time_date']      = date('Y-m-d H:i:s', strtotime($stdRes->retEvento->infEvento->dhRegEvento));
+                $docXml['xml_received']         = '';
+
+                DocXml::create($docXml);
+            }
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+
+        return "<script>window.close();</script>";
     }
 
     public function consultaCNPJ($cnpj){

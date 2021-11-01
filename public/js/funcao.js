@@ -357,6 +357,10 @@ $(document).ready(function(){
                     $('.btn-valida-nfe').addClass('d-none');
                 }else{
                     $('.btn-valida-nfe').removeClass('d-none');
+                    $('.a-ciencia').attr('href',$('.a-ciencia').data('url')+'/'+data.dados.id);
+                    $('.a-confirma').attr('href',$('.a-confirma').data('url')+'/'+data.dados.id);
+                    $('.a-desconhecimento').attr('href',$('.a-desconhecimento').data('url')+'/'+data.dados.id);
+                    $('.a-Nrealizada').attr('href',$('.a-Nrealizada').data('url')+'/'+data.dados.id);
                 }
 
                 $.each(data.dados.doc_xmls, (key, value) => {
@@ -370,8 +374,8 @@ $(document).ready(function(){
                         '<div class="row border rounded py-3 px-2">'+
                             '<div class="col-6 col-md-4 py-2 px-1">Chave Documento: '+value.doc_key+'</div>'+
                             '<div class="col-6 col-md-4 py-2 px-1">NSU: '+value.nsu+'</div>'+
-                            '<div class="col-6 col-md-4 py-2 px-1">Tipo de Evento: '+value.event_type+'</div>'+
-                            '<div class="col-6 col-md-4 py-2 px-1">Descrição do Evento: '+value.event_description+'</div>'+
+                            '<div class="col-6 col-md-4 py-2 px-1">Tipo de Evento: '+(value.event_type ? value.event_type : '0')+'</div>'+
+                            '<div class="col-6 col-md-4 py-2 px-1">Descrição do Evento: '+(value.event_description ? value.event_description: 'sem descrição')+'</div>'+
                             '<div class="col-6 col-md-4 py-2 px-1">Tipo de Documento: '+value.document_template+'</div>'+
                             '<div class="col-6 col-md-4 py-2 px-1"><a target="_blank" href="/baixar-xml/'+value.id+'" class="btn btn-primary">Baixar XML</a></div>'+
                         '</div>'

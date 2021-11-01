@@ -107,16 +107,16 @@
                     <div class="container btn-valida-nfe d-none mb-3">
                         <div class="row">
                             <div class="col-3">
-                                <a target="_blank" href="{{asset('ciencia-op/')}}" class="btn btn-success btn-block a-ciencia">Ciencia da Operação</a>
+                                <a target="_blank" href="#" data-url="{{asset('ciencia-op/')}}" class="btn btn-success btn-block a-ciencia">Ciencia da Operação</a>
                             </div>
                             <div class="col-3">
-                                <a target="_blank" href="{{asset('confirma-op/')}}" class="btn btn-success btn-block a-confirma">Confirmar Operação</a>
+                                <a target="_blank" href="#" data-url="{{asset('confirma-op/')}}" class="btn btn-success btn-block a-confirma">Confirmar Operação</a>
                             </div>
                             <div class="col-3">
-                                <a href="{{asset('desconhecimento-op/')}}" class="btn btn-success btn-block a-desconhecimento">Desconhecimento da Operação</a>
+                                <a href="#" data-url="{{asset('desconhecimento-op/')}}" class="btn btn-success btn-block a-desconhecimento">Desconhecimento da Operação</a>
                             </div>
                             <div class="col-3">
-                                <a href="{{asset('op-n-realizada/')}}" class="btn btn-success btn-block a-Nrealizada">Operação não Realizada</a>
+                                <a href="#" data-url="{{asset('op-n-realizada/')}}" class="btn btn-success btn-block a-Nrealizada">Operação não Realizada</a>
                             </div>
                         </div>
                     </div>
